@@ -42,6 +42,17 @@ def train_perceptron(data):
     #
     # YOUR CODE HERE!
     #
+    for it in range(MAX_ITERS):
+        errors = 0
+        for (x, y) in data:
+            activation = sum(w[i] * x[i] for i in range(numvars)) + b
+            if y * activation <= 0:  # Misclassified
+                for i in range(numvars):
+                    w[i] += y * x[i]
+                b += y
+                errors += 1
+        if errors == 0:
+            break  # Converged
 
     return (w, b)
 
@@ -54,8 +65,8 @@ def predict_perceptron(model, x):
     #
     # YOUR CODE HERE!
     #
-
-    return 0.0
+    activation = sum(w[i] * x[i] for i in range(len(x))) + b
+    return activation
 
 
 # Load train and test data.  Learn model.  Report accuracy.
