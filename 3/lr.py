@@ -31,6 +31,14 @@ def read_data(filename):
         data.append((x, y))
     return (data, varnames)
 
+# Train a logistic regression model using batch gradient descent
+def sigmoid(z):
+    if z >= 0:
+        ez = exp(-z)
+        return 1.0 / (1.0 + ez)
+    else:
+        ez = exp(z)
+        return ez / (1.0 + ez)
 
 # Train a logistic regression model using batch gradient descent
 def train_lr(data, eta, l2_reg_weight):
@@ -38,40 +46,32 @@ def train_lr(data, eta, l2_reg_weight):
     w = [0.0] * numvars
     b = 0.0
 
-    for it in range(MAX_ITERS):
-        dw = [0.0] * numvars
-        db = 0.0
-        total_loss = 0.0
+    for iteration in range(MAX_ITERS):
+        gradW = [0.0] * numvars
+        gradB = 0.0
 
-        for (x, y) in data:
+        for x, y in data:
+            if y == -1:
+                y = 0
+
             z = sum(w[i] * x[i] for i in range(numvars)) + b
-            yz = y * z
-            sig = 1.0 / (1.0 + exp(-yz))
+            yHat = sigmoid(z)
+            error = yHat - y 
 
-            # Gradient components
-            factor = (sig - 1) * y
             for i in range(numvars):
-                dw[i] += factor * x[i]
-            db += factor
+                gradW[i] += error * x[i]
+            gradB += error
 
-            # Logistic loss (with log-sum-exp trick)
-            total_loss += log(1 + exp(-yz))
-
-        # L2 regularization gradient and loss
         for i in range(numvars):
-            dw[i] = dw[i] / len(data) + l2_reg_weight * w[i]
-            total_loss += 0.5 * l2_reg_weight * w[i] ** 2
-        db = db / len(data)
+            gradW[i] += l2_reg_weight * w[i]
 
-        grad_norm = sqrt(sum(g ** 2 for g in dw) + db ** 2)
-
-        if grad_norm < 0.0001:
-            print("Converged.")
+        gradMagnitude = sqrt(sum(g ** 2 for g in gradW) + gradB ** 2)
+        if gradMagnitude < 1e-4:
             break
 
         for i in range(numvars):
-            w[i] -= eta * dw[i]
-        b -= eta * db
+            w[i] -= eta * gradW[i]
+        b -= eta * gradB
 
     return (w, b)
 
@@ -80,12 +80,8 @@ def train_lr(data, eta, l2_reg_weight):
 # attributes, x.
 def predict_lr(model, x):
     (w, b) = model
-    #
-    # YOUR CODE HERE
-    #
-    z = sum(w[i] * x[i] for i in range(len(x))) + b
-    prob = 1.0 / (1.0 + exp(-z))
-    return prob
+    z = sum(w[i] * x[i] for i in range(len(w))) + b
+    return sigmoid(z)
 
 # Load train and test data.  Learn model.  Report accuracy.
 def main(argv):
