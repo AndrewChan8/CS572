@@ -600,7 +600,7 @@ After training, report the following results below: **Train Loss**, **Train Accu
 If you make a mistake or want to try again, you can always rerun the relevant blocks as many times as needed to improve your results!
 """
 
-train_loss = 0.6910  # YOUR CODE HERE
-train_accuracy = 0.5705  # YOUR CODE HERE
-test_loss = 0.5019  # YOUR CODE HERE
-test_accuracy = 0.6071  # YOUR CODE HERE
+train_loss = 0.5009
+train_accuracy = 0.6923
+test_loss = 0.4922
+test_accuracy = 0.6071
